@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models import Activity
-from app.schemas import ActivityCreate
+from app.schemas import ActivityCreate, ActivityOut
+from typing import List
 
 router = APIRouter()
 
@@ -22,3 +23,8 @@ def create_activity(activity: ActivityCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_activity)
     return db_activity
+
+@router.get("/activities", response_model=list[ActivityOut])
+def get_activities(db: Session = Depends(get_db)):
+    activities = db.query(Activity).all()
+    return activities
